@@ -57,16 +57,17 @@ def main():
         {"name": "📄 Final Report", "key": "report"}
     ]
     
-    # Header
-    st.title("🤖 AutoML Classification System")
-    st.markdown("""
-    Welcome to the **AutoML Classification System**! This intelligent system helps you:
-    - 📊 Analyze your dataset automatically
-    - 🔍 Detect and fix data quality issues
-    - 🎯 Train multiple classification models
-    - 📈 Compare model performance
-    - 📄 Generate comprehensive reports
-    """)
+    # Header: show only on the first step
+    if st.session_state.get('current_step', 0) == 0:
+        st.title("🤖 AutoML Classification System")
+        st.markdown("""
+        Welcome to the **AutoML Classification System**! This intelligent system helps you:
+        - 📊 Analyze your dataset automatically
+        - 🔍 Detect and fix data quality issues
+        - 🎯 Train multiple classification models
+        - 📈 Compare model performance
+        - 📄 Generate comprehensive reports
+        """)
     
     # Progress indicator
     st.markdown("---")
@@ -113,68 +114,108 @@ def main():
     
     st.header(f"{current_step['name']}")
     
-    # Step 0: Dataset Upload
+    # Step 0: Dataset Upload (persisted view if dataset already uploaded)
     if current_step_idx == 0:
-        uploaded_file = st.file_uploader(
-            "Upload your CSV file",
-            type=['csv'],
-            help="Upload a CSV file containing your classification dataset"
-        )
-        
-        if uploaded_file is not None:
-            try:
-                df = pd.read_csv(uploaded_file)
-                st.session_state.dataset = df
-                
-                st.success("✅ Dataset loaded successfully!")
-                
-                # Display basic information
+        # If a dataset was previously uploaded, show persisted view
+        df = st.session_state.get('dataset')
+
+        def _clear_dataset():
+            # Clear dataset + related state but keep navigation state
+            keys_to_clear = ['dataset', 'processed_data', 'model_results', 'target_column', 'preprocessing_decisions', 'detected_issues']
+            for k in keys_to_clear:
+                if k in st.session_state:
+                    del st.session_state[k]
+            st.success('✅ Dataset removed.')
+            st.rerun()
+
+        if df is not None:
+            st.success("✅ Dataset is currently loaded (persisted in session state).")
+            col_info, col_actions = st.columns([4, 1])
+            with col_info:
                 display_dataset_info(df)
-                
-                # Target column selection
+                # Target column selection (remember previous selection if present)
                 st.subheader("🎯 Select Target Column")
-                target_col = st.selectbox(
-                    "Choose the target variable for classification:",
-                    options=df.columns.tolist()
-                )
+                options = df.columns.tolist()
+                default_index = 0
+                if st.session_state.get('target_column') in options:
+                    try:
+                        default_index = options.index(st.session_state.get('target_column'))
+                    except Exception:
+                        default_index = 0
+                target_col = st.selectbox("Choose the target variable for classification:", options=options, index=default_index, key='persisted_target_selector')
                 st.session_state.target_column = target_col
-                
                 if target_col:
                     st.info(f"Target column set to: **{target_col}**")
-                    
-                    # Display class distribution
                     st.subheader("📊 Class Distribution")
                     class_counts = df[target_col].value_counts()
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
+                    c1, c2 = st.columns(2)
+                    with c1:
                         st.dataframe(class_counts)
-                    
-                    with col2:
+                    with c2:
                         st.bar_chart(class_counts)
-                    
-                    # Next button
+
+            with col_actions:
+                # Provide a clear/remove dataset button
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("🗑️ Remove Dataset", use_container_width=True):
+                    _clear_dataset()
+
+            st.markdown("---")
+            if st.button("➡️ Continue to EDA", type="primary", use_container_width=True):
+                st.session_state.current_step = 1
+                st.rerun()
+        else:
+            # No persisted dataset; show uploader
+            uploaded_file = st.file_uploader(
+                "Upload your CSV file",
+                type=['csv'],
+                help="Upload a CSV file containing your classification dataset"
+            )
+
+            if uploaded_file is not None:
+                try:
+                    df = pd.read_csv(uploaded_file)
+                    st.session_state.dataset = df
+                    st.success("✅ Dataset loaded successfully!")
+                    display_dataset_info(df)
+                    # Let user choose target column immediately after upload
+                    options = df.columns.tolist()
+                    default_index = 0
+                    if st.session_state.get('target_column') in options:
+                        try:
+                            default_index = options.index(st.session_state.get('target_column'))
+                        except Exception:
+                            default_index = 0
+                    target_col = st.selectbox("Choose the target variable for classification:", options=options, index=default_index, key='uploaded_target_selector')
+                    st.session_state.target_column = target_col
+                    if target_col:
+                        st.info(f"Target column set to: **{target_col}**")
+                        st.subheader("📊 Class Distribution")
+                        class_counts = df[target_col].value_counts()
+                        c1, c2 = st.columns(2)
+                        with c1:
+                            st.dataframe(class_counts)
+                        with c2:
+                            st.bar_chart(class_counts)
                     st.markdown("---")
                     if st.button("➡️ Continue to EDA", type="primary", use_container_width=True):
                         st.session_state.current_step = 1
                         st.rerun()
-                        
-            except Exception as e:
-                st.error(f"❌ Error loading dataset: {str(e)}")
-        else:
-            # Sample dataset option
-            st.info("💡 Don't have a dataset? Try our sample datasets!")
-            sample_dataset = st.selectbox(
-                "Choose a sample dataset:",
-                ["None", "Iris", "Wine Quality"]
-            )
-            
-            if sample_dataset != "None":
-                if st.button("Load Sample Dataset"):
-                    df = load_sample_dataset(sample_dataset)
-                    st.session_state.dataset = df
-                    st.success(f"✅ {sample_dataset} dataset loaded!")
-                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Error loading dataset: {str(e)}")
+            else:
+                # Sample dataset option
+                st.info("💡 Don't have a dataset? Try our sample datasets!")
+                sample_dataset = st.selectbox(
+                    "Choose a sample dataset:",
+                    ["None", "Iris", "Wine Quality"]
+                )
+                if sample_dataset != "None":
+                    if st.button("Load Sample Dataset"):
+                        df = load_sample_dataset(sample_dataset)
+                        st.session_state.dataset = df
+                        st.success(f"✅ {sample_dataset} dataset loaded!")
+                        st.rerun()
     
     # Step 1: EDA
     elif current_step_idx == 1:

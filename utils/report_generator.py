@@ -32,21 +32,21 @@ def generate_report(dataset, target_column, detected_issues, preprocessing_decis
     
     # Display report preview
     st.markdown("---")
-    st.subheader("📋 Report Preview")
+    st.subheader("Report Preview")
     
     with st.expander("View Full Report", expanded=True):
         st.markdown(report_content)
     
     # Download options
     st.markdown("---")
-    st.subheader("💾 Download Report")
+    st.subheader("Download Report")
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         # Markdown download
         st.download_button(
-            label="📥 Markdown",
+            label="Markdown",
             data=report_content,
             file_name=f"automl_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
             mime="text/markdown",
@@ -57,7 +57,7 @@ def generate_report(dataset, target_column, detected_issues, preprocessing_decis
         # HTML download
         html_content = markdown_to_html(report_content)
         st.download_button(
-            label="📥 HTML",
+            label="HTML",
             data=html_content,
             file_name=f"automl_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html",
             mime="text/html",
@@ -72,22 +72,22 @@ def generate_report(dataset, target_column, detected_issues, preprocessing_decis
                 preprocessing_decisions, model_results
             )
             st.download_button(
-                label="📥 PDF",
+                label="PDF",
                 data=pdf_content,
                 file_name=f"automl_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
         except ImportError:
-            st.error("⚠️ PDF generation requires reportlab. Install it with: pip install reportlab")
+            st.error("PDF generation requires reportlab. Install it with: pip install reportlab")
         except Exception as e:
-            st.error(f"⚠️ PDF generation failed: {str(e)}")
+            st.error(f"PDF generation failed: {str(e)}")
     
     with col4:
         # CSV download (results only)
         csv_content = generate_results_csv(model_results)
         st.download_button(
-            label="📥 CSV",
+            label="CSV",
             data=csv_content,
             file_name=f"model_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
             mime="text/csv",
@@ -537,7 +537,7 @@ trained multiple classification models, and identified the best-performing model
         for mv in missing_values:
             report += f"| {mv['column']} | {mv['missing_count']} | {mv['missing_percentage']:.2f}% |\n"
     else:
-        report += "✅ No missing values detected.\n"
+        report += "No missing values detected.\n"
     
     report += "\n### Outliers\n\n"
     
@@ -550,15 +550,15 @@ trained multiple classification models, and identified the best-performing model
         for out in outliers:
             report += f"| {out['column']} | {out['outlier_count']} | {out['outlier_percentage']:.2f}% |\n"
     else:
-        report += "✅ No significant outliers detected.\n"
+        report += "No significant outliers detected.\n"
     
     report += "\n### Class Imbalance\n\n"
     
     imbalance = detected_issues.get('class_imbalance')
     if imbalance and imbalance.get('is_imbalanced'):
-        report += f"⚠️ Class imbalance detected with ratio {imbalance['imbalance_ratio']:.2f}:1\n"
+        report += f"Class imbalance detected with ratio {imbalance['imbalance_ratio']:.2f}:1\n"
     else:
-        report += "✅ Classes are relatively balanced.\n"
+        report += "Classes are relatively balanced.\n"
     
     # Detected issues
     report += f"""

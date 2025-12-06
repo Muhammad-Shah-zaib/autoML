@@ -71,7 +71,7 @@ def main():
     
     # Progress indicator
     st.markdown("---")
-    st.subheader("📊 Workflow Progress")
+    st.subheader("Workflow Progress")
     
     # Create progress bar
     progress_cols = st.columns(len(steps))
@@ -90,7 +90,31 @@ def main():
     st.markdown("---")
     
     # Sidebar - Manual navigation (optional)
-    st.sidebar.title("📍 Quick Navigation")
+    # Put the app logo/title at the top of the sidebar and keep it visible
+    st.sidebar.markdown(
+        """
+        <div style="
+            position: sticky;
+            top: 0;
+            background-color: rgba(255,255,255,0.98);
+            # padding: 8px 12px;
+            z-index: 9999;
+            border-bottom: 1px solid #eee;
+        ">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:50px;">🤖</span>
+                <div>
+                    <div style="font-weight:700;font-size:38px;margin-bottom:0;">AutoML</div>
+                    <div style="font-size:15px;color:#666;margin-top:2px;">Classification System</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.sidebar.markdown("------------------")
+    st.sidebar.subheader("Quick Navigation")
+
     st.sidebar.markdown("*You can jump to any completed step*")
     
     manual_step = st.sidebar.selectbox(
@@ -106,7 +130,7 @@ def main():
             st.session_state.current_step = manual_step
             st.rerun()
         else:
-            st.sidebar.error("⚠️ Please complete previous steps first!")
+            st.sidebar.error("Please complete previous steps first!")
     
     # Display current step
     current_step_idx = st.session_state.current_step
@@ -125,16 +149,16 @@ def main():
             for k in keys_to_clear:
                 if k in st.session_state:
                     del st.session_state[k]
-            st.success('✅ Dataset removed.')
+            st.success('Dataset removed.')
             st.rerun()
 
         if df is not None:
-            st.success("✅ Dataset is currently loaded (persisted in session state).")
+            st.success("Dataset is currently loaded (persisted in session state).")
             col_info, col_actions = st.columns([4, 1])
             with col_info:
                 display_dataset_info(df)
                 # Target column selection (remember previous selection if present)
-                st.subheader("🎯 Select Target Column")
+                st.subheader("Select Target Column")
                 options = df.columns.tolist()
                 default_index = 0
                 if st.session_state.get('target_column') in options:
@@ -146,7 +170,7 @@ def main():
                 st.session_state.target_column = target_col
                 if target_col:
                     st.info(f"Target column set to: **{target_col}**")
-                    st.subheader("📊 Class Distribution")
+                    st.subheader("Class Distribution")
                     class_counts = df[target_col].value_counts()
                     c1, c2 = st.columns(2)
                     with c1:
@@ -157,11 +181,11 @@ def main():
             with col_actions:
                 # Provide a clear/remove dataset button
                 st.markdown("<br>", unsafe_allow_html=True)
-                if st.button("🗑️ Remove Dataset", use_container_width=True):
+                if st.button("Remove Dataset", use_container_width=True):
                     _clear_dataset()
 
             st.markdown("---")
-            if st.button("➡️ Continue to EDA", type="primary", use_container_width=True):
+            if st.button("Continue to EDA  ➡️", type="primary", use_container_width=True):
                 st.session_state.current_step = 1
                 st.rerun()
         else:
@@ -176,7 +200,7 @@ def main():
                 try:
                     df = pd.read_csv(uploaded_file)
                     st.session_state.dataset = df
-                    st.success("✅ Dataset loaded successfully!")
+                    st.success("Dataset loaded successfully!")
                     display_dataset_info(df)
                     # Let user choose target column immediately after upload
                     options = df.columns.tolist()
@@ -190,7 +214,7 @@ def main():
                     st.session_state.target_column = target_col
                     if target_col:
                         st.info(f"Target column set to: **{target_col}**")
-                        st.subheader("📊 Class Distribution")
+                        st.subheader("Class Distribution")
                         class_counts = df[target_col].value_counts()
                         c1, c2 = st.columns(2)
                         with c1:
@@ -198,14 +222,14 @@ def main():
                         with c2:
                             st.bar_chart(class_counts)
                     st.markdown("---")
-                    if st.button("➡️ Continue to EDA", type="primary", use_container_width=True):
+                    if st.button("Continue to EDA  ➡️", type="primary", use_container_width=True):
                         st.session_state.current_step = 1
                         st.rerun()
                 except Exception as e:
-                    st.error(f"❌ Error loading dataset: {str(e)}")
+                    st.error(f"Error loading dataset: {str(e)}")
             else:
                 # Sample dataset option
-                st.info("💡 Don't have a dataset? Try our sample datasets!")
+                st.info("Don't have a dataset? Try our sample datasets!")
                 sample_dataset = st.selectbox(
                     "Choose a sample dataset:",
                     ["None", "Iris", "Wine Quality"]
@@ -214,14 +238,14 @@ def main():
                     if st.button("Load Sample Dataset"):
                         df = load_sample_dataset(sample_dataset)
                         st.session_state.dataset = df
-                        st.success(f"✅ {sample_dataset} dataset loaded!")
+                        st.success(f"{sample_dataset} dataset loaded!")
                         st.rerun()
     
     # Step 1: EDA
     elif current_step_idx == 1:
         if st.session_state.dataset is None:
-            st.warning("⚠️ Please upload a dataset first!")
-            if st.button("⬅️ Go Back to Dataset Upload"):
+            st.warning("Please upload a dataset first!")
+            if st.button("⬅️  Go Back to Dataset Upload"):
                 st.session_state.current_step = 0
                 st.rerun()
             return
@@ -232,18 +256,18 @@ def main():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("⬅️ Back to Dataset Upload", use_container_width=True):
+            if st.button("⬅️  Back to Dataset Upload", use_container_width=True):
                 st.session_state.current_step = 0
                 st.rerun()
         with col2:
-            if st.button("➡️ Continue to Issue Detection", type="primary", use_container_width=True):
+            if st.button("Continue to Issue Detection  ➡️", type="primary", use_container_width=True):
                 st.session_state.current_step = 2
                 st.rerun()
     
     # Step 2: Issue Detection
     elif current_step_idx == 2:
         if st.session_state.dataset is None:
-            st.warning("⚠️ Please upload a dataset first!")
+            st.warning("Please upload a dataset first!")
             return
         
         detected_issues = detect_issues(
@@ -256,18 +280,18 @@ def main():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("⬅️ Back to EDA", use_container_width=True):
+            if st.button("⬅️  Back to EDA", use_container_width=True):
                 st.session_state.current_step = 1
                 st.rerun()
         with col2:
-            if st.button("➡️ Continue to Preprocessing", type="primary", use_container_width=True):
+            if st.button("Continue to Preprocessing  ➡️", type="primary", use_container_width=True):
                 st.session_state.current_step = 3
                 st.rerun()
     
     # Step 3: Preprocessing
     elif current_step_idx == 3:
         if st.session_state.dataset is None:
-            st.warning("⚠️ Please upload a dataset first!")
+            st.warning("Please upload a dataset first!")
             return
         
         processed_data = preprocess_data(
@@ -283,27 +307,27 @@ def main():
             st.markdown("---")
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("⬅️ Back to Issue Detection", use_container_width=True):
+                if st.button("⬅️  Back to Issue Detection", use_container_width=True):
                     st.session_state.current_step = 2
                     st.rerun()
             with col2:
-                if st.button("➡️ Continue to Model Training", type="primary", use_container_width=True):
+                if st.button("Continue to Model Training  ➡️", type="primary", use_container_width=True):
                     st.session_state.current_step = 4
-                    st.success("✅ Preprocessing completed! Moving to model training...")
+                    st.success("Preprocessing completed! Moving to model training...")
                     st.rerun()
     
     # Step 4: Model Training
     elif current_step_idx == 4:
         if st.session_state.processed_data is None:
-            st.warning("⚠️ Please complete preprocessing first!")
+            st.warning("Please complete preprocessing first!")
             return
         
         # Show training results if already trained
         if st.session_state.model_results is not None and len(st.session_state.model_results) > 0:
-            st.success(f"✅ Training completed! {len(st.session_state.model_results)} models trained successfully.")
+            st.success(f"Training completed! {len(st.session_state.model_results)} models trained successfully.")
             
             # Show brief summary
-            st.subheader("📊 Quick Summary")
+            st.subheader("Quick Summary")
             summary_data = []
             for model_name, results in st.session_state.model_results.items():
                 summary_data.append({
@@ -317,11 +341,11 @@ def main():
             st.dataframe(summary_df, use_container_width=True)
             
             # Individual model details in expanders
-            st.subheader("🔍 Individual Model Details")
+            st.subheader("Individual Model Details")
             st.markdown("*Click on each model to see detailed metrics and training time*")
             
             for model_name, results in st.session_state.model_results.items():
-                with st.expander(f"📊 {model_name} - {results['training_time']:.2f}s"):
+                with st.expander(f"{model_name} - {results['training_time']:.2f}s"):
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
                         st.metric("Accuracy", f"{results['accuracy']:.4f}")
@@ -332,22 +356,22 @@ def main():
                     with col4:
                         st.metric("F1-Score", f"{results['f1_score']:.4f}")
                     
-                    st.write(f"**⏱️ Training Time:** {results['training_time']:.2f} seconds")
+                    st.write(f"**Training Time:** {results['training_time']:.2f} seconds")
                     if results['roc_auc'] is not None:
-                        st.write(f"**📈 ROC-AUC:** {results['roc_auc']:.4f}")
+                        st.write(f"**ROC-AUC:** {results['roc_auc']:.4f}")
             
             # Navigation buttons AFTER training
             st.markdown("---")
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("⬅️ Back to Preprocessing", use_container_width=True):
+                if st.button("⬅️  Back to Preprocessing", use_container_width=True):
                     st.session_state.current_step = 3
                     st.rerun()
                 if st.button("🔄 Retrain Models", use_container_width=True):
                     st.session_state.model_results = None
                     st.rerun()
             with col2:
-                if st.button("➡️ View Model Comparison", type="primary", use_container_width=True):
+                if st.button("View Model Comparison  ➡️", type="primary", use_container_width=True):
                     st.session_state.current_step = 5
                     st.rerun()
         else:
@@ -357,19 +381,19 @@ def main():
             # Save results immediately if returned
             if model_results is not None and len(model_results) > 0:
                 st.session_state.model_results = model_results
-                st.success(f"✅ Successfully trained {len(model_results)} models!")
+                st.success(f"Successfully trained {len(model_results)} models!")
                 st.rerun()  # Reload to show the results
             else:
                 # Show back button if training not started
                 st.markdown("---")
-                if st.button("⬅️ Back to Preprocessing", use_container_width=True):
+                if st.button("⬅️  Back to Preprocessing", use_container_width=True):
                     st.session_state.current_step = 3
                     st.rerun()
     
     # Step 5: Model Comparison
     elif current_step_idx == 5:
         if st.session_state.model_results is None:
-            st.warning("⚠️ Please train models first!")
+            st.warning("Please train models first!")
             return
         
         compare_models(st.session_state.model_results)
@@ -378,11 +402,11 @@ def main():
         st.markdown("---")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("⬅️ Back to Model Training", use_container_width=True):
+            if st.button("⬅️  Back to Model Training", use_container_width=True):
                 st.session_state.current_step = 4
                 st.rerun()
         with col2:
-            if st.button("➡️ Generate Final Report", type="primary", use_container_width=True):
+            if st.button("Generate Final Report  ➡️ ", type="primary", use_container_width=True):
                 st.session_state.current_step = 6
                 st.rerun()
     
@@ -414,28 +438,28 @@ def main():
                     del st.session_state[key]
                 st.rerun()
     
-    # Footer
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📊 Session Status")
-    st.sidebar.write(f"✅ Dataset: {'Loaded' if st.session_state.dataset is not None else 'Not loaded'}")
-    st.sidebar.write(f"✅ Target: {st.session_state.target_column if st.session_state.target_column else 'Not selected'}")
-    st.sidebar.write(f"✅ Preprocessing: {'Done' if st.session_state.processed_data is not None else 'Pending'}")
-    st.sidebar.write(f"✅ Models: {'Trained' if st.session_state.model_results is not None else 'Not trained'}")
+    # # Footer
+    # st.sidebar.markdown("---")
+    # st.sidebar.markdown("### Session Status")
+    # st.sidebar.write(f"Dataset: {'Loaded' if st.session_state.dataset is not None else 'Not loaded'}")
+    # st.sidebar.write(f"Target: {st.session_state.target_column if st.session_state.target_column else 'Not selected'}")
+    # st.sidebar.write(f"Preprocessing: {'Done' if st.session_state.processed_data is not None else 'Pending'}")
+    # st.sidebar.write(f"Models: {'Trained' if st.session_state.model_results is not None else 'Not trained'}")
     
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📚 About")
-    st.sidebar.info("""
-    **AutoML Classification System**
+    # st.sidebar.markdown("---")
+    # st.sidebar.markdown("### 📚 About")
+    # st.sidebar.info("""
+    # **AutoML Classification System**
     
-    Built with ❤️ using Streamlit
+    # Built with ❤️ using Streamlit
     
-    Features:
-    - Automated EDA
-    - Smart issue detection
-    - Multi-model training
-    - Hyperparameter optimization
-    - Comprehensive reporting
-    """)
+    # Features:
+    # - Automated EDA
+    # - Smart issue detection
+    # - Multi-model training
+    # - Hyperparameter optimization
+    # - Comprehensive reporting
+    # """)
 
 def load_sample_dataset(dataset_name):
     """Load sample datasets"""

@@ -182,20 +182,20 @@ def display_issues_and_get_approval(issues, df):
     ])
     
     if total_issues == 0:
-        st.success("✅ No major issues detected! Your dataset looks good.")
+        st.success("No major issues detected! Your dataset looks good.")
         return
     
-    st.warning(f"⚠️ Found {total_issues} issue(s) in your dataset")
+    st.warning(f"Found {total_issues} issue(s) in your dataset")
     
     # Missing Values
     if len(issues['missing_values']) > 0:
-        with st.expander("📊 Missing Values", expanded=True):
+        with st.expander("Missing Values", expanded=True):
             st.write(f"**Found missing values in {len(issues['missing_values'])} column(s)**")
             
             missing_df = pd.DataFrame(issues['missing_values'])
             st.dataframe(missing_df, use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info('''
             **Options:**
             - Impute numerical features with mean/median
@@ -204,7 +204,7 @@ def display_issues_and_get_approval(issues, df):
             ''')
             
             # Get user approval
-            is_missing_fixed = st.checkbox("✅ I want to fix missing values", key="fix_missing")
+            is_missing_fixed = st.checkbox("I want to fix missing values", key="fix_missing")
             
             if is_missing_fixed:
                 st.session_state.preprocessing_decisions['fix_missing_values'] = True
@@ -216,14 +216,14 @@ def display_issues_and_get_approval(issues, df):
     
     # Outliers
     if len(issues['outliers']) > 0:
-        with st.expander("📉 Outliers", expanded=True):
+        with st.expander("Outliers", expanded=True):
             st.write(f"**Found outliers in {len(issues['outliers'])} column(s)**")
             
             outlier_df = pd.DataFrame(issues['outliers'])
             st.dataframe(outlier_df[['column', 'outlier_count', 'outlier_percentage']], 
                          use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info('''
             **Options:**
             - Cap outliers at IQR bounds (Winsorization)
@@ -240,7 +240,7 @@ def display_issues_and_get_approval(issues, df):
     
     # Class Imbalance
     if issues['class_imbalance'] and issues['class_imbalance']['is_imbalanced']:
-        with st.expander("⚖️ Class Imbalance", expanded=True):
+        with st.expander("Class Imbalance", expanded=True):
             imb_info = issues['class_imbalance']
             st.write("**Imbalanced class distribution detected!**")
             
@@ -252,7 +252,7 @@ def display_issues_and_get_approval(issues, df):
             with col2:
                 st.metric("Imbalance Ratio", f"{imb_info['imbalance_ratio']:.2f}:1")
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info('''
             **Options:**
             - Use SMOTE (Synthetic Minority Over-sampling)
@@ -270,13 +270,13 @@ def display_issues_and_get_approval(issues, df):
     
     # High Cardinality 
     if len(issues['high_cardinality']) > 0:
-        with st.expander("🔢 High Cardinality Features", expanded=True):
+        with st.expander("High Cardinality Features", expanded=True):
             st.write(f"**Found {len(issues['high_cardinality'])} high cardinality feature(s)**")
             
             cardinality_df = pd.DataFrame(issues['high_cardinality'])
             st.dataframe(cardinality_df, use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info('''
             **Options:**
             - Group rare categories into 'Other'
@@ -284,7 +284,7 @@ def display_issues_and_get_approval(issues, df):
             - Remove features with extreme cardinality
             ''')
             
-            is_cardinality_fixed = st.checkbox("✅ Group rare categories", key="fix_cardinality")
+            is_cardinality_fixed = st.checkbox("Group rare categories", key="fix_cardinality")
             
             if is_cardinality_fixed:
                 st.session_state.preprocessing_decisions['fix_high_cardinality'] = True
@@ -299,13 +299,13 @@ def display_issues_and_get_approval(issues, df):
 
     # Constant Features 
     if len(issues['constant_features']) > 0:
-        with st.expander("📏 Constant/Near-Constant Features", expanded=True):
+        with st.expander("Constant/Near-Constant Features", expanded=True):
             st.write(f"**Found {len(issues['constant_features'])} constant/near-constant feature(s)**")
             
             constant_df = pd.DataFrame(issues['constant_features'])
             st.dataframe(constant_df, use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.warning("Constant features provide no information for prediction and should be removed.")
             
             is_constant_removed = st.checkbox("✅ Remove constant features", key="remove_constant")
@@ -319,15 +319,15 @@ def display_issues_and_get_approval(issues, df):
     
     # Duplicate Rows 
     if issues['duplicate_rows']['duplicate_count'] > 0:
-        with st.expander("🔄 Duplicate Rows", expanded=True):
+        with st.expander("Duplicate Rows", expanded=True):
             dup_info = issues['duplicate_rows']
             st.write(f"**Found {dup_info['duplicate_count']} duplicate rows " 
                             f"({dup_info['duplicate_percentage']:.2f}%)**")
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.warning("Duplicate rows can bias model training and should typically be removed.")
             
-            is_duplicates_removed = st.checkbox("✅ Remove duplicate rows", key="remove_duplicates")
+            is_duplicates_removed = st.checkbox("Remove duplicate rows", key="remove_duplicates")
             
             if is_duplicates_removed:
                 st.session_state.preprocessing_decisions['remove_duplicates'] = True
@@ -338,7 +338,7 @@ def display_issues_and_get_approval(issues, df):
     
     # Summary
     st.markdown("---")
-    st.subheader("📋 Preprocessing Decisions Summary")
+    st.subheader("Preprocessing Decisions Summary")
     
     if len(st.session_state.preprocessing_decisions) > 0:
         # Convert decisions into a DataFrame; convert values to strings to avoid Arrow warnings
@@ -349,8 +349,8 @@ def display_issues_and_get_approval(issues, df):
         decisions_df = pd.DataFrame(decisions_list)
         st.dataframe(decisions_df, use_container_width=True)
         
-        if st.button("✅ Confirm Decisions", type="primary"):
-            st.success("✅ Decisions confirmed! Proceed to the Preprocessing step.")
+        if st.button("Confirm Decisions", type="primary"):
+            st.success("Decisions confirmed! Proceed to the Preprocessing step.")
     else:
         st.info("Select the fixes you want to apply, then confirm your decisions.")
 import streamlit as st
@@ -525,7 +525,7 @@ def display_issues_and_get_approval(issues, df):
     if 'preprocessing_decisions' not in st.session_state:
         st.session_state.preprocessing_decisions = {}
         
-    st.markdown("### 🔍 Detected Issues")
+    st.markdown("### Detected Issues")
     
     total_issues = sum([
         len(issues['missing_values']),
@@ -537,20 +537,20 @@ def display_issues_and_get_approval(issues, df):
     ])
     
     if total_issues == 0:
-        st.success("✅ No major issues detected! Your dataset looks good.")
+        st.success("No major issues detected! Your dataset looks good.")
         return
     
-    st.warning(f"⚠️ Found {total_issues} issue(s) in your dataset")
+    st.warning(f"Found {total_issues} issue(s) in your dataset")
     
     # Missing Values
     if len(issues['missing_values']) > 0:
-        with st.expander("📊 Missing Values", expanded=True):
+        with st.expander("Missing Values", expanded=True):
             st.write(f"**Found missing values in {len(issues['missing_values'])} column(s)**")
             
             missing_df = pd.DataFrame(issues['missing_values'])
             st.dataframe(missing_df, use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info("""
             **Options:**
             - Impute numerical features with mean/median
@@ -559,7 +559,7 @@ def display_issues_and_get_approval(issues, df):
             """)
             
             # Get user approval
-            is_missing_fixed = st.checkbox("✅ I want to fix missing values", key="fix_missing")
+            is_missing_fixed = st.checkbox("I want to fix missing values", key="fix_missing")
             
             if is_missing_fixed:
                 st.session_state.preprocessing_decisions['fix_missing_values'] = True
@@ -571,14 +571,14 @@ def display_issues_and_get_approval(issues, df):
     
     # Outliers
     if len(issues['outliers']) > 0:
-        with st.expander("📉 Outliers", expanded=True):
+        with st.expander("Outliers", expanded=True):
             st.write(f"**Found outliers in {len(issues['outliers'])} column(s)**")
             
             outlier_df = pd.DataFrame(issues['outliers'])
             st.dataframe(outlier_df[['column', 'outlier_count', 'outlier_percentage']], 
                          use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info("""
             **Options:**
             - Cap outliers at IQR bounds (Winsorization)
@@ -595,7 +595,7 @@ def display_issues_and_get_approval(issues, df):
     
     # Class Imbalance
     if issues['class_imbalance'] and issues['class_imbalance']['is_imbalanced']:
-        with st.expander("⚖️ Class Imbalance", expanded=True):
+        with st.expander("Class Imbalance", expanded=True):
             imb_info = issues['class_imbalance']
             st.write("**Imbalanced class distribution detected!**")
             
@@ -607,7 +607,7 @@ def display_issues_and_get_approval(issues, df):
             with col2:
                 st.metric("Imbalance Ratio", f"{imb_info['imbalance_ratio']:.2f}:1")
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info("""
             **Options:**
             - Use SMOTE (Synthetic Minority Over-sampling)
@@ -625,13 +625,13 @@ def display_issues_and_get_approval(issues, df):
     
     # High Cardinality 
     if len(issues['high_cardinality']) > 0:
-        with st.expander("🔢 High Cardinality Features", expanded=True):
+        with st.expander("High Cardinality Features", expanded=True):
             st.write(f"**Found {len(issues['high_cardinality'])} high cardinality feature(s)**")
             
             cardinality_df = pd.DataFrame(issues['high_cardinality'])
             st.dataframe(cardinality_df, use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.info("""
             **Options:**
             - Group rare categories into 'Other'
@@ -639,7 +639,7 @@ def display_issues_and_get_approval(issues, df):
             - Remove features with extreme cardinality
             """)
             
-            is_cardinality_fixed = st.checkbox("✅ Group rare categories", key="fix_cardinality")
+            is_cardinality_fixed = st.checkbox("Group rare categories", key="fix_cardinality")
             
             if is_cardinality_fixed:
                 st.session_state.preprocessing_decisions['fix_high_cardinality'] = True
@@ -654,16 +654,16 @@ def display_issues_and_get_approval(issues, df):
 
     # Constant Features 
     if len(issues['constant_features']) > 0:
-        with st.expander("📏 Constant/Near-Constant Features", expanded=True):
+        with st.expander("Constant/Near-Constant Features", expanded=True):
             st.write(f"**Found {len(issues['constant_features'])} constant/near-constant feature(s)**")
             
             constant_df = pd.DataFrame(issues['constant_features'])
             st.dataframe(constant_df, use_container_width=True)
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.warning("Constant features provide no information for prediction and should be removed.")
             
-            is_constant_removed = st.checkbox("✅ Remove constant features", key="remove_constant")
+            is_constant_removed = st.checkbox("Remove constant features", key="remove_constant")
             
             if is_constant_removed:
                 st.session_state.preprocessing_decisions['remove_constant_features'] = True
@@ -674,15 +674,15 @@ def display_issues_and_get_approval(issues, df):
     
     # Duplicate Rows 
     if issues['duplicate_rows']['duplicate_count'] > 0:
-        with st.expander("🔄 Duplicate Rows", expanded=True):
+        with st.expander("Duplicate Rows", expanded=True):
             dup_info = issues['duplicate_rows']
             st.write(f"**Found {dup_info['duplicate_count']} duplicate rows " 
                             f"({dup_info['duplicate_percentage']:.2f}%)**")
             
-            st.subheader("💡 Suggested Fix")
+            st.subheader("Suggested Fix")
             st.warning("Duplicate rows can bias model training and should typically be removed.")
             
-            is_duplicates_removed = st.checkbox("✅ Remove duplicate rows", key="remove_duplicates")
+            is_duplicates_removed = st.checkbox("Remove duplicate rows", key="remove_duplicates")
             
             if is_duplicates_removed:
                 st.session_state.preprocessing_decisions['remove_duplicates'] = True
@@ -693,7 +693,7 @@ def display_issues_and_get_approval(issues, df):
     
     # Summary
     st.markdown("---")
-    st.subheader("📋 Preprocessing Decisions Summary")
+    st.subheader("Preprocessing Decisions Summary")
     
     if len(st.session_state.preprocessing_decisions) > 0:
         # Convert decisions into a DataFrame; convert values to strings to avoid Arrow warnings
@@ -704,7 +704,7 @@ def display_issues_and_get_approval(issues, df):
         decisions_df = pd.DataFrame(decisions_list)
         st.dataframe(decisions_df, use_container_width=True)
         
-        if st.button("✅ Confirm Decisions", type="primary"):
-            st.success("✅ Decisions confirmed! Proceed to the Preprocessing step.")
+        if st.button("Confirm Decisions", type="primary"):
+            st.success("Decisions confirmed! Proceed to the Preprocessing step.")
     else:
         st.info("Select the fixes you want to apply, then confirm your decisions.")

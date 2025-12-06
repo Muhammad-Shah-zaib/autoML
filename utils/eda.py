@@ -71,16 +71,16 @@ def perform_eda(df, target_column):
     """
     Perform comprehensive exploratory data analysis
     """
-    st.markdown("### 🔍 Comprehensive Data Analysis")
+    st.markdown("### Comprehensive Data Analysis")
     
     # Create tabs for different analyses
     tabs = st.tabs([
-        "📊 Missing Values",
-        "📉 Outlier Detection",
-        "🔗 Correlation Analysis",
-        "📈 Distribution Analysis",
-        "📊 Categorical Analysis",
-        "✂️ Train/Test Split"
+        "Missing Values",
+        "Outlier Detection",
+        "Correlation Analysis",
+        "Distribution Analysis",
+        "Categorical Analysis",
+        "Train/Test Split"
     ])
     
     # Wrap the content of each tab in a Streamlit spinner to improve perceived performance
@@ -111,13 +111,13 @@ def perform_eda(df, target_column):
 
 def missing_values_analysis(df):
     """Analyze missing values in the dataset"""
-    st.subheader("📊 Missing Values Analysis")
+    st.subheader("Missing Values Analysis")
     
     # Use cached function
     missing_data = calculate_missing_data(df)
     
     if len(missing_data) == 0:
-        st.success("✅ No missing values found in the dataset!")
+        st.success("No missing values found in the dataset!")
     else:
         col1, col2 = st.columns(2)
         
@@ -144,7 +144,7 @@ def missing_values_analysis(df):
             st.plotly_chart(fig, use_container_width=True)
         
         # Heatmap of missing values (Matplotlib is slower, but necessary)
-        st.subheader("🗺️ Missing Values Heatmap")
+        st.subheader("Missing Values Heatmap")
         fig, ax = plt.subplots(figsize=(12, 6))
         sns.heatmap(df.isnull(), cbar=True, cmap='YlOrRd', ax=ax)
         plt.title('Missing Values Heatmap')
@@ -153,7 +153,7 @@ def missing_values_analysis(df):
 
 def outlier_detection(df, target_column):
     """Detect outliers using IQR and Z-score methods"""
-    st.subheader("📉 Outlier Detection")
+    st.subheader("Outlier Detection")
     
     # Get numerical columns
     numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -170,7 +170,7 @@ def outlier_detection(df, target_column):
     st.dataframe(outlier_df, use_container_width=True)
     
     # Visualize outliers for selected column
-    st.subheader("📊 Outlier Visualization")
+    st.subheader("Outlier Visualization")
     # No need to cache the selectbox, it's just a widget
     selected_col = st.selectbox("Select column to visualize:", numerical_cols)
     
@@ -203,7 +203,7 @@ def outlier_detection(df, target_column):
 
 def correlation_analysis(df, target_column):
     """Analyze correlations between features"""
-    st.subheader("🔗 Correlation Analysis")
+    st.subheader("Correlation Analysis")
     
     # Get numerical columns
     numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -236,7 +236,7 @@ def correlation_analysis(df, target_column):
     
     # Correlation with target
     if target_column in numerical_cols:
-        st.subheader(f"📊 Correlation with Target ({target_column})")
+        st.subheader(f"Correlation with Target ({target_column})")
         target_corr = corr_matrix[target_column].drop(target_column).sort_values(
             key=abs, ascending=False
         )
@@ -266,7 +266,7 @@ def correlation_analysis(df, target_column):
             st.plotly_chart(fig, use_container_width=True)
     
     # High correlation pairs (Quick calculation, no need to cache)
-    st.subheader("⚠️ Highly Correlated Feature Pairs")
+    st.subheader("Highly Correlated Feature Pairs")
     high_corr_pairs = []
     for i in range(len(corr_matrix.columns)):
         for j in range(i+1, len(corr_matrix.columns)):
@@ -285,7 +285,7 @@ def correlation_analysis(df, target_column):
 
 def distribution_analysis(df, target_column):
     """Analyze distributions of numerical features"""
-    st.subheader("📈 Distribution Analysis")
+    st.subheader("Distribution Analysis")
     
     numerical_cols = df.select_dtypes(include=[np.number]).columns.tolist()
     if target_column in numerical_cols:
@@ -326,7 +326,7 @@ def distribution_analysis(df, target_column):
         plt.close(fig) # Explicitly close the Matplotlib figure
     
     # Statistical tests (Quick calculation, no need to cache)
-    st.subheader("📊 Statistical Summary")
+    st.subheader("Statistical Summary")
     col1, col2, col3 = st.columns(3)
     
     data = df[selected_feature].dropna()
@@ -345,7 +345,7 @@ def distribution_analysis(df, target_column):
     
     # Distribution by target (if categorical target)
     if target_column and df[target_column].dtype == 'object' or df[target_column].nunique() < 10:
-        st.subheader(f"📊 Distribution by {target_column}")
+        st.subheader(f"Distribution by {target_column}")
         # Box plot (Plotly is fast)
         fig = px.box(df, x=target_column, y=selected_feature, 
                      title=f'{selected_feature} by {target_column}')
@@ -365,7 +365,7 @@ def calculate_crosstab(df, selected_feature, target_column):
 
 def categorical_analysis(df, target_column):
     """Analyze categorical features"""
-    st.subheader("📊 Categorical Features Analysis")
+    st.subheader("Categorical Features Analysis")
     
     categorical_cols = df.select_dtypes(include=['object', 'category']).columns.tolist()
     if target_column in categorical_cols:
@@ -406,7 +406,7 @@ def categorical_analysis(df, target_column):
     
     # Relationship with target
     if target_column:
-        st.subheader(f"🔗 Relationship with {target_column}")
+        st.subheader(f"Relationship with {target_column}")
         
         # Use cached function
         crosstab = calculate_crosstab(df, selected_feature, target_column)
@@ -425,7 +425,7 @@ def categorical_analysis(df, target_column):
 
 def train_test_split_info(df):
     """Display information about train/test split (No heavy lifting, no caching needed)"""
-    st.subheader("✂️ Train/Test Split Configuration")
+    st.subheader("Train/Test Split Configuration")
     
     st.info("""
     The dataset will be split into training and testing sets during the preprocessing phase.

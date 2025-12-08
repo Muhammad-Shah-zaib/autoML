@@ -8,7 +8,7 @@ import numpy as np
 
 def load_dataset(uploaded_file):
     """
-    Load dataset from uploaded file
+    Load dataset from uploaded file with encoding detection
     
     Args:
         uploaded_file: Streamlit uploaded file object
@@ -17,7 +17,13 @@ def load_dataset(uploaded_file):
         pd.DataFrame: Loaded dataset
     """
     try:
-        df = pd.read_csv(uploaded_file)
+        # Try UTF-8 first, then fallback to latin1
+        try:
+            df = pd.read_csv(uploaded_file, encoding='utf-8')
+        except UnicodeDecodeError:
+            uploaded_file.seek(0)  # Reset file pointer
+            df = pd.read_csv(uploaded_file, encoding='latin1')
+            st.warning("⚠️ Dataset loaded with latin1 encoding")
         return df
     except Exception as e:
         st.error(f"Error loading dataset: {str(e)}")

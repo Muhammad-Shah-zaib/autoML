@@ -1,6 +1,6 @@
 """
 Data Preprocessing Module
-Applies user-approved preprocessing steps
+Applies user-approved preprocessing steps with logging
 """
 
 import streamlit as st
@@ -12,6 +12,8 @@ from sklearn.impute import SimpleImputer
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 import warnings
+from datetime import datetime
+
 warnings.filterwarnings('ignore')
 
 def preprocess_data(df, target_column, detected_issues):

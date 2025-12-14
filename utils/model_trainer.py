@@ -1,6 +1,6 @@
 """
 Model Training Module
-Train multiple classification models with hyperparameter optimization
+Train multiple classification models with hyperparameter optimization and validation
 """
 
 import streamlit as st

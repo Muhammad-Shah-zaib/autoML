@@ -13,7 +13,10 @@ st.set_page_config(
     page_title="AutoML Classification System",
     page_icon="🤖",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items={
+        'About': "AutoML Classification System - Automated ML Pipeline"
+    }
 )
 
 # Import custom modules

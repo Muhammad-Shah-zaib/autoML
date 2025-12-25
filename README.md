@@ -762,10 +762,6 @@ We are considering the following enhancements for future versions:
 - Model compression techniques
 - GPU acceleration support
 
-## License
-
-This project is licensed under the MIT License. You are free to use, modify, and distribute this software in accordance with the license terms.
-
 ## Acknowledgments
 
 We would like to acknowledge the following open-source projects that made this work possible:
